@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>💘 Valentine?</title>
+  <title>💘 Gowsalya, be my Valentine?</title>
   <style>
     :root { --bg1:#fff0f6; --bg2:#ffe3ef; --card:#ffffffd9; --text:#2b2b2b; }
     * { box-sizing: border-box; }
@@ -33,7 +33,7 @@
     }
 
     .card{
-      width:min(560px, 92vw);
+      width:min(640px, 92vw);
       padding:28px 22px;
       background: var(--card);
       backdrop-filter: blur(10px);
@@ -43,21 +43,40 @@
       text-align:center;
       position:relative;
     }
+    .badge{
+      display:inline-block;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: #ffffffb5;
+      border: 1px solid #ffd1df;
+      font-weight: 700;
+      font-size: 13px;
+      margin-bottom: 12px;
+    }
+
     h1{
       margin: 0 0 10px;
-      font-size: clamp(28px, 4vw, 40px);
+      font-size: clamp(26px, 4vw, 42px);
       letter-spacing:.2px;
+      line-height: 1.15;
     }
-    p{
-      margin: 0 0 22px;
+
+    .sub{
+      margin: 0 0 18px;
       font-size: 15px;
-      opacity:.85;
+      opacity:.9;
+    }
+
+    .note{
+      margin: 0 0 22px;
+      font-size: 13px;
+      opacity:.75;
     }
 
     .arena{
       position:relative;
       width: 100%;
-      height: 180px;
+      height: 190px;
       border-radius: 18px;
       background: linear-gradient(180deg, #ffffffb5, #ffffff60);
       border: 1px dashed #ff9ebb;
@@ -72,9 +91,9 @@
       padding: 12px 18px;
       border-radius: 999px;
       font-size: 16px;
-      font-weight: 700;
+      font-weight: 800;
       cursor:pointer;
-      transition: transform .12s ease, box-shadow .12s ease;
+      transition: transform .12s ease, box-shadow .12s ease, filter .12s ease;
       user-select:none;
       -webkit-tap-highlight-color: transparent;
       touch-action: manipulation;
@@ -85,6 +104,7 @@
       box-shadow: 0 10px 20px rgba(255,77,109,.25);
       margin-right: 14px;
     }
+    #yesBtn:hover{ filter: brightness(1.02); }
     #yesBtn:active{ transform: scale(.98); }
 
     /* The "No" button is positioned absolutely so it can run away */
@@ -101,8 +121,20 @@
     .result{
       margin-top: 18px;
       font-size: 16px;
-      font-weight: 700;
+      font-weight: 800;
       min-height: 22px;
+    }
+
+    .tiny{
+      margin-top: 10px;
+      font-size: 12px;
+      opacity: .72;
+    }
+
+    .footer{
+      margin-top: 18px;
+      font-size: 12px;
+      opacity: .75;
     }
 
     .confetti{
@@ -126,15 +158,21 @@
   <div class="hearts"></div>
 
   <div class="card">
-    <h1>Will you be my Valentine? 💘</h1>
-    <p>(Be honest… but not *too* honest 😌)</p>
+    <div class="badge">For Gowsalya 💖 from Karthick</div>
+
+    <h1>Gowsalya… will you be my Valentine? 💘</h1>
+    <p class="sub">I’m officially requesting your “Yes” with full love + full confidence 😌</p>
+    <p class="note">(Also… the “No” option is just for decoration. Please don’t judge my UI decisions.)</p>
 
     <div class="arena" id="arena">
-      <button id="yesBtn">Yes 💖</button>
+      <button id="yesBtn">Yes, Karthick 💞</button>
       <button id="noBtn" aria-label="No">No 🙃</button>
     </div>
 
     <div class="result" id="result"></div>
+    <div class="tiny" id="tiny"></div>
+
+    <div class="footer">Made with ❤️ by Karthick • Only for Gowsalya</div>
   </div>
 
   <div class="confetti" id="confetti"></div>
@@ -144,36 +182,41 @@
     const noBtn = document.getElementById("noBtn");
     const yesBtn = document.getElementById("yesBtn");
     const result = document.getElementById("result");
+    const tiny = document.getElementById("tiny");
     const confetti = document.getElementById("confetti");
 
-    // Keep "No" from being clickable even if someone manages to tap it.
+    let escapeCount = 0;
+
+    // Prevent "No" from being clickable (even if someone manages to tap it)
     noBtn.addEventListener("click", (e) => {
       e.preventDefault();
       e.stopPropagation();
-      runAway();
+      runAway(true);
     });
 
     // Run away on hover (desktop) and on touchstart (mobile)
-    noBtn.addEventListener("mouseenter", runAway);
+    noBtn.addEventListener("mouseenter", () => runAway(false));
     noBtn.addEventListener("touchstart", (e) => {
       e.preventDefault(); // stops the tap click
-      runAway();
+      runAway(true);
     }, { passive: false });
 
-    // Also run away if pointer gets close (fun + makes it even harder to click)
+    // Run away if pointer gets close (makes it extra hard to click)
     arena.addEventListener("pointermove", (e) => {
       const rect = noBtn.getBoundingClientRect();
       const dx = e.clientX - (rect.left + rect.width / 2);
       const dy = e.clientY - (rect.top + rect.height / 2);
       const dist = Math.hypot(dx, dy);
-      if (dist < 80) runAway();
+      if (dist < 90) runAway(false);
     });
 
-    function runAway(){
-      const pad = 12;
+    function runAway(isTouch){
+      escapeCount++;
+
+      const pad = 14;
       const a = arena.getBoundingClientRect();
 
-      // pick a random spot within the arena bounds
+      // random spot within arena bounds
       const x = pad + Math.random() * (a.width - pad * 2);
       const y = pad + Math.random() * (a.height - pad * 2);
 
@@ -181,32 +224,51 @@
       noBtn.style.top  = y + "px";
       noBtn.style.transform = "translate(-50%, -50%)";
 
-      // tiny wiggle so it feels alive
+      // tiny wiggle animation
       noBtn.animate([
         { transform: "translate(-50%, -50%) rotate(0deg) scale(1)" },
-        { transform: "translate(-50%, -50%) rotate(6deg) scale(1.02)" },
-        { transform: "translate(-50%, -50%) rotate(-6deg) scale(1.02)" },
+        { transform: "translate(-50%, -50%) rotate(7deg) scale(1.03)" },
+        { transform: "translate(-50%, -50%) rotate(-7deg) scale(1.03)" },
         { transform: "translate(-50%, -50%) rotate(0deg) scale(1)" },
       ], { duration: 220, easing: "ease-out" });
+
+      // playful message under buttons
+      const lines = [
+        "Nice try 😌",
+        "Not today 🙃",
+        "Nope — love only 💘",
+        "Gowsalya, that button is shy 😂",
+        "Karthick has disabled that option 🤭",
+        "Okay okay… stop chasing it 😭"
+      ];
+      tiny.textContent = lines[Math.min(lines.length - 1, Math.floor(escapeCount / 2))];
+
+      // On touch, make it even more dramatic
+      if (isTouch && escapeCount % 3 === 0) {
+        tiny.textContent = "Mobile mode detected. No button is in full sprint 🏃‍♂️💨";
+      }
     }
 
     yesBtn.addEventListener("click", () => {
-      result.textContent = "YAY!! 💞 I knew it! Get ready for extra love, snacks, and cute pics 🥹📸";
+      result.textContent = "YAY!! 💞 Gowsalya said YES! Karthick is the happiest human alive 🥹✨";
+      tiny.textContent = "Now come here… Valentine date loading: 100% 🍫🌹";
       popConfetti();
+
       yesBtn.disabled = true;
-      yesBtn.style.opacity = 0.85;
-      noBtn.style.opacity = 0.6;
+      yesBtn.style.opacity = 0.88;
+
+      // Let the No button finally rest (optional)
+      noBtn.style.opacity = 0.55;
     });
 
     function popConfetti(){
       const colors = ["#ff4d6d", "#ff758f", "#ffd6e8", "#1f2430", "#ffb3c6"];
-      for(let i=0;i<90;i++){
+      for(let i=0;i<95;i++){
         const d = document.createElement("div");
         d.className = "piece";
         d.style.left = Math.random() * 100 + "vw";
         d.style.top = (-10 - Math.random()*30) + "px";
         d.style.background = colors[Math.floor(Math.random()*colors.length)];
-        d.style.transform = `rotate(${Math.random()*180}deg)`;
         d.style.animationDuration = (1 + Math.random()*1.2) + "s";
         d.style.width = (6 + Math.random()*10) + "px";
         d.style.height = (8 + Math.random()*14) + "px";
@@ -215,8 +277,8 @@
       }
     }
 
-    // Put No somewhere random on load
-    runAway();
+    // Place No somewhere random on load
+    runAway(false);
   </script>
 </body>
 </html>
